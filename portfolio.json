@@ -1,0 +1,33 @@
+{
+  "cash": 7616.0,
+  "positions": {
+    "solana": {
+      "qty": 1.0,
+      "avg_price": 85.32
+    },
+    "ethereum": {
+      "qty": 1.0,
+      "avg_price": 2298.68
+    }
+  },
+  "trades": [
+    {
+      "type": "BUY",
+      "coin": "solana",
+      "symbol": "SOL",
+      "qty": 1.0,
+      "price": 85.32,
+      "total": 85.32,
+      "timestamp": "2026-04-21T12:48:14.376946"
+    },
+    {
+      "type": "BUY",
+      "coin": "ethereum",
+      "symbol": "ETH",
+      "qty": 1.0,
+      "price": 2298.68,
+      "total": 2298.68,
+      "timestamp": "2026-04-21T12:49:01.727214"
+    }
+  ]
+}
