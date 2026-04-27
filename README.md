@@ -1,4 +1,4 @@
-# TP1 — Simple Trading Simulator
+# Simple Trading Simulator
 
 A front-office prototype built in Python that fetches **live crypto prices** from the
 CoinGecko public API, simulates buy/sell orders, and persists your portfolio between
@@ -19,7 +19,7 @@ sessions using a local JSON file.
 
 ```bash
 # 1 – Clone / unzip the project and enter the folder
-cd tp1_trading_simulator
+cd Trading-Simulator
 
 # 2 – (Optional but recommended) Create a virtual environment
 python -m venv .venv
