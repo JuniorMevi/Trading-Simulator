@@ -57,7 +57,7 @@ def fetch_prices() -> dict:
 
 
 # ─────────────────────────────────────────────
-#  STEPS 4  – CREATE A PORTFOLIO STRUCTURE 
+#  STEP 4 – CREATE A PORTFOLIO STRUCTURE
 # ─────────────────────────────────────────────
 
 def default_portfolio() -> dict:
@@ -69,8 +69,9 @@ def default_portfolio() -> dict:
     }
 
 # ─────────────────────────────────────────────
-#  STEPS 5 – SAVE AND LOAD OUR PORTFOLIO STRUCTURE 
+#  STEP 5 – SAVE AND LOAD OUR PORTFOLIO
 # ─────────────────────────────────────────────
+
 def save_portfolio(portfolio: dict) -> None:
     """Save the portfolio dictionary to portfolio.json."""
     with open(PORTFOLIO_FILE, "w") as f:
@@ -91,7 +92,7 @@ def load_portfolio() -> dict:
 
 
 # ─────────────────────────────────────────────
-#  STEP 6 – BUY's IMPLEMENTATION
+#  STEP 6 – BUY
 # ─────────────────────────────────────────────
 
 def buy(portfolio: dict, coin: str, qty: float, prices: dict) -> None:
@@ -100,9 +101,9 @@ def buy(portfolio: dict, coin: str, qty: float, prices: dict) -> None:
         print(f"[ERROR] No price available for {coin}.")
         return
 
-    price    = prices[coin]
-    cost     = price * qty
-    symbol   = COIN_SYMBOLS.get(coin, coin.upper())
+    price  = prices[coin]
+    cost   = price * qty
+    symbol = COIN_SYMBOLS.get(coin, coin.upper())
 
     if cost > portfolio["cash"]:
         print(f"[BUY ] Insufficient funds. Need ${cost:,.2f} but have ${portfolio['cash']:,.2f}")
@@ -113,8 +114,8 @@ def buy(portfolio: dict, coin: str, qty: float, prices: dict) -> None:
 
     # Update position (weighted average price)
     pos = portfolio["positions"].get(coin, {"qty": 0.0, "avg_price": 0.0})
-    total_qty   = pos["qty"] + qty
-    avg_price   = (pos["qty"] * pos["avg_price"] + qty * price) / total_qty
+    total_qty = pos["qty"] + qty
+    avg_price = (pos["qty"] * pos["avg_price"] + qty * price) / total_qty
     portfolio["positions"][coin] = {"qty": total_qty, "avg_price": avg_price}
 
     # Record trade
@@ -131,8 +132,9 @@ def buy(portfolio: dict, coin: str, qty: float, prices: dict) -> None:
 
     print(f"[BUY ] {qty} {symbol} @ ${price:,.2f} = ${cost:,.2f} | Cash left: ${portfolio['cash']:,.2f}")
 
+
 # ─────────────────────────────────────────────
-#  STEP 7 – SELL's IMPLEMENTATION
+#  STEP 7 – SELL
 # ─────────────────────────────────────────────
 
 def sell(portfolio: dict, coin: str, qty: float, prices: dict) -> None:
@@ -180,7 +182,7 @@ def sell(portfolio: dict, coin: str, qty: float, prices: dict) -> None:
 
 
 # ─────────────────────────────────────────────
-#  STEP 7 – PORTFOLIO SUMMARY
+#  STEP 8 – PORTFOLIO SUMMARY
 # ─────────────────────────────────────────────
 
 def display_summary(portfolio: dict, prices: dict) -> None:
@@ -192,26 +194,22 @@ def display_summary(portfolio: dict, prices: dict) -> None:
     print(f"{'PORTFOLIO SUMMARY':^{width}}")
     print(f"{'═' * width}")
 
-    # Cash
     print(f"  {'Cash (USD)':<30} ${portfolio['cash']:>12,.2f}")
     print(sep)
 
-    # Positions
     total_market_value = 0.0
-    total_pnl          = 0.0
 
     if portfolio["positions"]:
         print(f"  {'Coin':<8} {'Qty':>10} {'Avg Cost':>12} {'Mkt Price':>12} {'Mkt Value':>12} {'PnL':>10}")
         print(sep)
         for coin, pos in portfolio["positions"].items():
-            symbol  = COIN_SYMBOLS.get(coin, coin.upper())
-            qty     = pos["qty"]
-            avg     = pos["avg_price"]
-            mkt     = prices.get(coin, avg)
-            value   = mkt * qty
-            pnl     = (mkt - avg) * qty
+            symbol = COIN_SYMBOLS.get(coin, coin.upper())
+            qty    = pos["qty"]
+            avg    = pos["avg_price"]
+            mkt    = prices.get(coin, avg)
+            value  = mkt * qty
+            pnl    = (mkt - avg) * qty
             total_market_value += value
-            total_pnl          += pnl
             pnl_str = f"+{pnl:,.2f}" if pnl >= 0 else f"{pnl:,.2f}"
             print(f"  {symbol:<8} {qty:>10.4f} {avg:>12,.2f} {mkt:>12,.2f} {value:>12,.2f} {pnl_str:>10}")
     else:
@@ -225,36 +223,52 @@ def display_summary(portfolio: dict, prices: dict) -> None:
     print(f"  {'Market Value':<30} ${total_market_value:>12,.2f}")
     print(f"  {'Total Equity':<30} ${total_equity:>12,.2f}")
     print(f"  {'Overall PnL vs initial':<30} {pnl_tag:>13}")
-    print(f"{'═' * width}")
-
-    # Trade history
-    if portfolio["trades"]:
-        print(f"\n  Last {min(5, len(portfolio['trades']))} trade(s):")
-        print(f"  {'Type':<6} {'Symbol':<5} {'Qty':>8} {'Price':>12} {'Total':>12}  {'Time'}")
-        print(sep)
-        for t in portfolio["trades"][-5:]:
-            print(
-                f"  {t['type']:<6} {t['symbol']:<5} {t['qty']:>8.4f} "
-                f"{t['price']:>12,.2f} {t['total']:>12,.2f}  {t['timestamp'][:19]}"
-            )
-    print()
+    print(f"{'═' * width}\n")
 
 
 # ─────────────────────────────────────────────
-#  INTERACTIVE MENU
+#  STEP 9 – TRADE HISTORY (option séparée)
+# ─────────────────────────────────────────────
+
+def display_trade_history(portfolio: dict) -> None:
+    """Print the full trade history."""
+    width = 60
+    sep   = "─" * width
+
+    print(f"\n{'═' * width}")
+    print(f"{'TRADE HISTORY':^{width}}")
+    print(f"{'═' * width}")
+
+    if not portfolio["trades"]:
+        print("  No trades yet.")
+    else:
+        print(f"  {'#':<4} {'Type':<6} {'Symbol':<5} {'Qty':>8} {'Price':>12} {'Total':>12}")
+        print(sep)
+        for i, t in enumerate(portfolio["trades"], 1):
+            print(
+                f"  {i:<4} {t['type']:<6} {t['symbol']:<5} {t['qty']:>8.4f} "
+                f"{t['price']:>12,.2f} {t['total']:>12,.2f}"
+            )
+            print(f"       Time: {t['timestamp'][:19]}")
+    print(f"{'═' * width}\n")
+
+
+# ─────────────────────────────────────────────
+#  STEP 9 – INTERACTIVE MENU
 # ─────────────────────────────────────────────
 
 def interactive_menu(portfolio: dict, prices: dict) -> None:
     """Simple text-based menu for manual trading."""
     while True:
         print("\n┌─────────────────────────────┐")
-        print("|     TRADING SIMULATOR MENU  │")
+        print("│     TRADING SIMULATOR MENU  │")
         print("├─────────────────────────────┤")
         print("│  1 – Refresh prices         │")
         print("│  2 – Buy crypto             │")
         print("│  3 – Sell crypto            │")
         print("│  4 – Portfolio summary      │")
-        print("│  5 – Save & quit            │")
+        print("│  5 – View trade history     │")
+        print("│  6 – Save & quit            │")
         print("└─────────────────────────────┘")
         choice = input("Your choice: ").strip()
 
@@ -273,6 +287,7 @@ def interactive_menu(portfolio: dict, prices: dict) -> None:
                 print("[ERROR] Invalid quantity.")
                 continue
             buy(portfolio, coin, qty, prices)
+            save_portfolio(portfolio)  #  save après chaque achat
 
         elif choice == "3":
             print(f"Available coins: {', '.join(SUPPORTED_COINS)}")
@@ -286,11 +301,15 @@ def interactive_menu(portfolio: dict, prices: dict) -> None:
                 print("[ERROR] Invalid quantity.")
                 continue
             sell(portfolio, coin, qty, prices)
+            save_portfolio(portfolio)  # save après chaque vente
 
         elif choice == "4":
             display_summary(portfolio, prices)
 
         elif choice == "5":
+            display_trade_history(portfolio)  # option séparée
+
+        elif choice == "6":
             save_portfolio(portfolio)
             print("Goodbye!\n")
             break
@@ -309,25 +328,12 @@ def main():
     print("       Powered by CoinGecko live prices")
     print("=" * 60)
 
-    # Step 3 – fetch & display live prices
-    prices = fetch_prices()
+    prices    = fetch_prices()
     if not prices:
         print("[WARN] Prices unavailable – some features may be limited.")
 
-    # Steps 4 & 5 – load portfolio (or create default)
     portfolio = load_portfolio()
-
-    # Step 7 – show summary at startup
     display_summary(portfolio, prices)
-
-    # Demo auto-trades (commented out by default)
-    # buy(portfolio,  "bitcoin",  0.01, prices)
-    # buy(portfolio,  "ethereum", 0.5,  prices)
-    # sell(portfolio, "bitcoin",  0.005, prices)
-    # display_summary(portfolio, prices)
-    # save_portfolio(portfolio)
-
-    # Step 8 – interactive menu
     interactive_menu(portfolio, prices)
 
 
